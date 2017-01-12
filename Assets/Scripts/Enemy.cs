@@ -17,8 +17,9 @@ public class Enemy : MonoBehaviour {
 
     public GameObject player;
     PlayerHealth playerHealth;
-    NavMeshAgent catEnemyAgent;
 
+    NavMeshAgent catEnemyAgent;
+    EnemyHealth enemyHealth;
 
     Rigidbody rb;
     Animator animator;
@@ -45,6 +46,8 @@ public class Enemy : MonoBehaviour {
         hissAudio = GetComponent<AudioSource>();
         catEnemyAgent = GetComponent<NavMeshAgent>();
 
+        enemyHealth = GetComponent<EnemyHealth>();
+
 
         // attackSound = GetComponent<AudioClip>();
 
@@ -60,41 +63,40 @@ public class Enemy : MonoBehaviour {
         timer += Time.deltaTime;
         soundTimer += Time.deltaTime;
 
-        distanceToPlayer = Vector3.Distance(player.transform.position, transform.position);
+        if (!enemyHealth.isDead)
+        { 
+            distanceToPlayer = Vector3.Distance(player.transform.position, transform.position);
 
-        if ((distanceToPlayer < noticePlayerDistance) && !playerHealth.isDead )
-        {
-            stateWalk = true;
-            //LookAtPlayer();
-            Invoke("MoveTowardsPlayer", 0.3f);
+            if ((distanceToPlayer < noticePlayerDistance) && !playerHealth.isDead)
+            {
+                stateWalk = true;
+                //LookAtPlayer();
+                Invoke("MoveTowardsPlayer", 0.3f);
 
+            }
+            else
+            {
+                //animator.SetBool("IsWalking", false);
+                stateWalk = false;
+                catEnemyAgent.Stop();
+
+
+            }
+            if (catEnemyAgent.remainingDistance <= attackRange)  //(distanceToPlayer <= attackRange)
+            {
+
+                //animator.SetBool("Attack", true);
+                stateAttack = true;
+
+            }
+            else
+            {
+                //animator.SetBool("Attack", false);
+                stateAttack = false;
+          
+            }
         }
-        else
-        {
-            //animator.SetBool("IsWalking", false);
-            stateWalk = false;
-            catEnemyAgent.Stop();
 
-
-
-        }
-        if (catEnemyAgent.remainingDistance <= attackRange)  //(distanceToPlayer <= attackRange)
-
-        {
-
-            //animator.SetBool("Attack", true);
-            stateAttack = true;
-
-        }
-        else
-        {
-            //animator.SetBool("Attack", false);
-            stateAttack = false;
-
-
-        }
-
-        
         AnimatorUpdate();
 
 
@@ -125,10 +127,12 @@ public class Enemy : MonoBehaviour {
     {
         // if (!playerHealth.isDead)
         //transform.position += transform.forward * enemyMoveSpeed * Time.deltaTime;
-        catEnemyAgent.SetDestination(player.transform.position);
+        if (!enemyHealth.isDead)
+        {
+            catEnemyAgent.SetDestination(player.transform.position);
 
-        catEnemyAgent.Resume();
-
+            catEnemyAgent.Resume();
+        }
 
 
 

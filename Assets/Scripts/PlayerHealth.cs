@@ -25,6 +25,8 @@ public class PlayerHealth : MonoBehaviour {
     bool damaged;
     public GameAndScoreManager gameManager;
 
+    
+
     // Use this for initialization
     void Awake ()
     {
